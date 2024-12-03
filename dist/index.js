@@ -69,9 +69,6 @@ class ObjectService extends base_service_class_1.BaseService {
             */
             debug.write(node_debug_1.MessageType.Step, 'Checking is latest...');
             this._checkIsLatest(primaryKey.is_latest);
-            if (typeof primaryKey.object_number == 'undefined') {
-                throw new node_errors_1.BadRequestError('object_number is required');
-            }
             debug.write(node_debug_1.MessageType.Step, 'Finding object number...');
             yield this._findObjectNumber(query, primaryKey.repository_uuid, primaryKey.object_number);
             debug.write(node_debug_1.MessageType.Step, 'Calling update(base)...');
@@ -96,9 +93,6 @@ class ObjectService extends base_service_class_1.BaseService {
             */
             debug.write(node_debug_1.MessageType.Step, 'Checking is latest...');
             this._checkIsLatest(primaryKey.is_latest);
-            if (typeof primaryKey.object_number == 'undefined') {
-                throw new node_errors_1.BadRequestError('object_number is required');
-            }
             debug.write(node_debug_1.MessageType.Step, 'Finding object number...');
             yield this._findObjectNumber(query, primaryKey.repository_uuid, primaryKey.object_number);
             debug.write(node_debug_1.MessageType.Step, 'Calling delete(base)...');

@@ -77,7 +77,7 @@ export abstract class ObjectService<
 
   async update(
     query: Query,
-    primaryKey: PrimaryKey,
+    primaryKey: Required<PrimaryKey>,
     updateData: UpdateData<Data>,
     userUUID?: string,
   ): Promise<Row<PrimaryKey, Data, System>> {
@@ -97,9 +97,6 @@ export abstract class ObjectService<
     */
     debug.write(MessageType.Step, 'Checking is latest...');
     this._checkIsLatest(primaryKey.is_latest);
-    if (typeof primaryKey.object_number == 'undefined') {
-      throw new BadRequestError('object_number is required');
-    }
     debug.write(MessageType.Step, 'Finding object number...');
     await this._findObjectNumber(
       query,
@@ -112,7 +109,7 @@ export abstract class ObjectService<
     return row;
   }
 
-  async delete(query: Query, primaryKey: PrimaryKey): Promise<void> {
+  async delete(query: Query, primaryKey: Required<PrimaryKey>): Promise<void> {
     const debug = new Debug(`${this.name}.delete(object)`);
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
     debug.write(MessageType.Step, 'Finding repository (for update)...');
@@ -124,9 +121,6 @@ export abstract class ObjectService<
     */
     debug.write(MessageType.Step, 'Checking is latest...');
     this._checkIsLatest(primaryKey.is_latest);
-    if (typeof primaryKey.object_number == 'undefined') {
-      throw new BadRequestError('object_number is required');
-    }
     debug.write(MessageType.Step, 'Finding object number...');
     await this._findObjectNumber(
       query,
