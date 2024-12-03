@@ -5,7 +5,7 @@ import {
   Row,
   UpdateData,
 } from 'base-service-class';
-import { findByPrimaryKey } from 'database-helpers';
+import { createRow, findByPrimaryKey } from 'database-helpers';
 import { Debug, MessageType } from 'node-debug';
 import { BadRequestError } from 'node-errors';
 // import { Row as Repository, service as repositoryService } from 'repository-service';
@@ -68,7 +68,13 @@ export abstract class ObjectService<
       },
       { columnNames: ['next_object_number'] },
     )) as { next_object_number: number };
+    debug.write(MessageType.Value, `next_object_number=${next_object_number}`);
     createData.object_number = next_object_number;
+    debug.write(MessageType.Step, 'Creating object number...');
+    await createRow(query, '_object_numbers', {
+      repository_uuid: createData.repository_uuid,
+      object_number: createData.object_number,
+    });
     debug.write(MessageType.Step, 'Calling create(base)...');
     const row = await super.create(query, createData, userUUID);
     debug.write(MessageType.Exit, `row=${JSON.stringify(row)}`);

@@ -44,7 +44,13 @@ class ObjectService extends base_service_class_1.BaseService {
             const { next_object_number } = (yield (0, database_helpers_1.findByPrimaryKey)(query, '_next_object_numbers', {
                 repository_uuid: createData.repository_uuid,
             }, { columnNames: ['next_object_number'] }));
+            debug.write(node_debug_1.MessageType.Value, `next_object_number=${next_object_number}`);
             createData.object_number = next_object_number;
+            debug.write(node_debug_1.MessageType.Step, 'Creating object number...');
+            yield (0, database_helpers_1.createRow)(query, '_object_numbers', {
+                repository_uuid: createData.repository_uuid,
+                object_number: createData.object_number,
+            });
             debug.write(node_debug_1.MessageType.Step, 'Calling create(base)...');
             const row = yield _super.create.call(this, query, createData, userUUID);
             debug.write(node_debug_1.MessageType.Exit, `row=${JSON.stringify(row)}`);
