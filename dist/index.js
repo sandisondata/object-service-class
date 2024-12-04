@@ -76,7 +76,10 @@ class ObjectService extends base_service_class_1.BaseService {
             debug.write(node_debug_1.MessageType.Step, 'Checking is latest...');
             this._checkIsLatest(primaryKey.is_latest);
             debug.write(node_debug_1.MessageType.Step, 'Finding object number...');
-            yield this._findObjectNumber(query, primaryKey.repository_uuid, primaryKey.object_number);
+            yield this._findObjectNumber(query, {
+                repository_uuid: primaryKey.repository_uuid,
+                object_number: primaryKey.object_number,
+            });
             debug.write(node_debug_1.MessageType.Step, 'Calling update(base)...');
             const row = yield _super.update.call(this, query, primaryKey, updateData, userUUID);
             debug.write(node_debug_1.MessageType.Exit, `row=${JSON.stringify(row)}`);
@@ -100,7 +103,10 @@ class ObjectService extends base_service_class_1.BaseService {
             debug.write(node_debug_1.MessageType.Step, 'Checking is latest...');
             this._checkIsLatest(primaryKey.is_latest);
             debug.write(node_debug_1.MessageType.Step, 'Finding object number...');
-            yield this._findObjectNumber(query, primaryKey.repository_uuid, primaryKey.object_number);
+            const objectNumber = yield this._findObjectNumber(query, {
+                repository_uuid: primaryKey.repository_uuid,
+                object_number: primaryKey.object_number,
+            });
             debug.write(node_debug_1.MessageType.Step, 'Calling delete(base)...');
             yield _super.delete.call(this, query, primaryKey);
             debug.write(node_debug_1.MessageType.Exit);
@@ -119,12 +125,9 @@ class ObjectService extends base_service_class_1.BaseService {
             throw new node_errors_1.BadRequestError('is_latest must be true');
         }
     }
-    _findObjectNumber(query, repository_uuid, object_number) {
+    _findObjectNumber(query, primaryKey) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield (0, database_helpers_1.findByPrimaryKey)(query, '_object_numbers', {
-                repository_uuid: repository_uuid,
-                object_number: object_number,
-            });
+            return (yield (0, database_helpers_1.findByPrimaryKey)(query, '_object_numbers', primaryKey));
         });
     }
 }

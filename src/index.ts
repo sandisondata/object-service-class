@@ -20,6 +20,15 @@ export type PrimaryKey = {
 
 const primaryKeyColumns = ['repository_uuid', 'is_latest', 'object_number'];
 
+type ObjectNumberPrimaryKey = {
+  repository_uuid: string;
+  object_number: number;
+};
+
+type ObjectNumber = ObjectNumberPrimaryKey & {
+  is_installed: boolean;
+};
+
 export abstract class ObjectService<
   Data extends Record<string, any>,
   System extends Record<string, any> = Record<string, never>,
@@ -104,11 +113,10 @@ export abstract class ObjectService<
     debug.write(MessageType.Step, 'Checking is latest...');
     this._checkIsLatest(primaryKey.is_latest);
     debug.write(MessageType.Step, 'Finding object number...');
-    await this._findObjectNumber(
-      query,
-      primaryKey.repository_uuid,
-      primaryKey.object_number,
-    );
+    await this._findObjectNumber(query, {
+      repository_uuid: primaryKey.repository_uuid,
+      object_number: primaryKey.object_number,
+    });
     debug.write(MessageType.Step, 'Calling update(base)...');
     const row = await super.update(query, primaryKey, updateData, userUUID);
     debug.write(MessageType.Exit, `row=${JSON.stringify(row)}`);
@@ -128,11 +136,10 @@ export abstract class ObjectService<
     debug.write(MessageType.Step, 'Checking is latest...');
     this._checkIsLatest(primaryKey.is_latest);
     debug.write(MessageType.Step, 'Finding object number...');
-    await this._findObjectNumber(
-      query,
-      primaryKey.repository_uuid,
-      primaryKey.object_number,
-    );
+    const objectNumber = await this._findObjectNumber(query, {
+      repository_uuid: primaryKey.repository_uuid,
+      object_number: primaryKey.object_number,
+    });
     debug.write(MessageType.Step, 'Calling delete(base)...');
     await super.delete(query, primaryKey);
     debug.write(MessageType.Exit);
@@ -157,12 +164,12 @@ export abstract class ObjectService<
 
   private async _findObjectNumber(
     query: Query,
-    repository_uuid: string,
-    object_number: number,
+    primaryKey: ObjectNumberPrimaryKey,
   ) {
-    await findByPrimaryKey(query, '_object_numbers', {
-      repository_uuid: repository_uuid,
-      object_number: object_number,
-    });
+    return (await findByPrimaryKey(
+      query,
+      '_object_numbers',
+      primaryKey,
+    )) as ObjectNumber;
   }
 }
